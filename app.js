@@ -6,6 +6,9 @@ var logger = require('morgan');
 const mongoose = require('mongoose');
 const env = require('env2')('./env');
 
+//! Express Sessions Imports
+const session = require('express-session');
+const FileStore = require('session-file-store')(session);
 
 //Mongoose Stuff
 ; // put in a config file
@@ -40,6 +43,7 @@ app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/teams', teamRouter);
 
+//app.use(cookieParser('12345-67890-09876-54321'));
 //! Cookies
 function auth(req, res, next) {
   if (!req.signedCookies.user) {
@@ -76,7 +80,7 @@ function auth(req, res, next) {
 
 app.use(auth);
 
-//! End Cookies
+//! END Cookies
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
