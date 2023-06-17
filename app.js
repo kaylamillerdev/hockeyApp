@@ -6,6 +6,9 @@ var logger = require('morgan');
 const mongoose = require('mongoose');
 const env = require('env2')('./env');
 
+//! Express Sessions Imports
+const session = require('express-session');
+const FileStore = require('session-file-store')(session);
 
 //Mongoose Stuff
 ; // put in a config file
@@ -40,43 +43,37 @@ app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/teams', teamRouter);
 
-//! Cookies
-function auth(req, res, next) {
-  if (!req.signedCookies.user) {
-    const authHeader = req.headers.authorization;
-    if (!authHeader) {
-        const err = new Error('You are not authenticated!');
-        res.setHeader('WWW-Authenticate', 'Basic');
-        err.status = 401;
-        return next(err);
-    }
+//! auth
 
-    const auth = Buffer.from(authHeader.split(' ')[1], 'base64').toString().split(':');
-    const user = auth[0];
-    const pass = auth[1];
-    if (user === 'admin' && pass === 'password') {
-        res.cookie('user', 'admin', {signed: true});
-        return next(); // authorized
-    } else {
-        const err = new Error('You are not authenticated!');
-        res.setHeader('WWW-Authenticate', 'Basic');
-        err.status = 401;
-        return next(err);
-    }
+app.use(session({
+  name: 'session-id',
+  secret: '12345-67890-09876-54321',
+  saveUninitialized: false,
+  resave: false,
+  store: new FileStore()
+}));
+
+function auth(req, res, next) {
+  console.log(req.session);
+
+  if (!req.session.user) {
+      const err = new Error('You are not authenticated!');
+      err.status = 401;
+      return next(err);
   } else {
-    if (req.signedCookies.user === 'admin') {
-        return next();
-    } else {
-        const err = new Error('You are not authenticated!');
-        err.status = 401;
-        return next(err);
-    }
+      if (req.session.user === 'authenticated') {
+          return next();
+      } else {
+          const err = new Error('You are not authenticated!');
+          err.status = 401;
+          return next(err);
+      }
   }
 }
 
 app.use(auth);
 
-//! End Cookies
+//! End auth
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
