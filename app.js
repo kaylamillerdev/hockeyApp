@@ -7,8 +7,8 @@ const mongoose = require('mongoose');
 const env = require('env2')('./env');
 //Mongoose Stuff
 ; // put in a config file
-
-const connect = mongoose.connect(process.env.cloudUrl, {
+const localUrl='mongodb://localhost:27017/hockeyLeague2';
+const connect = mongoose.connect(localUrl, {
   useCreateIndex: true,
   useFindAndModify: false,
   useNewUrlParser: true,
@@ -18,9 +18,9 @@ const connect = mongoose.connect(process.env.cloudUrl, {
 connect.then(() => console.log('Connected correctly to mongodb server')).catch(err => console.log(err));
 // End Mongoose Stuff
 
-var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
-var teamRouter = require('./routes/teamsRouter');
+const indexRouter = require('./routes/index');
+const usersRouter = require('./routes/users');
+const teamRouter = require('./routes/teamsRouter');
 
 var app = express();
 
