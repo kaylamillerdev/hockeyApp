@@ -38,6 +38,33 @@ app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/teams', teamRouter);
 
+//! Basic Auth
+function auth(req, res, next) {
+  const authHeader = req.headers.authorization;
+  if (!authHeader) {
+    const err = new Error('You are not authenticated!');
+    res.setHeader('WWW-Authenticate', 'Basic');
+    err.status = 401;
+    return next(err);
+  }
+
+  const auth = Buffer.from(authHeader.split(' ')[1], 'base64').toString().split(':');
+  const user = auth[0];
+  const pass = auth[1];
+  if (user === 'admin' && pass === 'password') {
+      return next(); // authorized
+  } else {
+      const err = new Error('You are not authenticated!');
+      res.setHeader('WWW-Authenticate', 'Basic');      
+      err.status = 401;
+      return next(err);
+  }
+}
+
+app.use(auth);
+
+//! End Basic Auth
+
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   next(createError(404));
