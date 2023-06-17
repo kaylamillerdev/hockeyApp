@@ -6,10 +6,6 @@ var logger = require('morgan');
 const mongoose = require('mongoose');
 const env = require('env2')('./env');
 
-//! Express Sessions Imports
-const session = require('express-session');
-const FileStore = require('session-file-store')(session);
-
 
 //Mongoose Stuff
 ; // put in a config file
